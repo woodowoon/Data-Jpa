@@ -14,7 +14,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 class MemberJpaRepositoryTest {
 
-    @Autowired MemberJpaRepository memberJpaRepository;
+    @Autowired
+    MemberJpaRepository memberJpaRepository;
 
     @Test
     public void testMember() throws Exception {
