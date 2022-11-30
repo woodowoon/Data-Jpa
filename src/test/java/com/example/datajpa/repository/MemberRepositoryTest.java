@@ -12,6 +12,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +25,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MemberRepositoryTest {
     @Autowired MemberRepository memberRepository;
     @Autowired TeamRepository teamRepository;
+    @PersistenceContext
+    EntityManager em;
 
     @Test
     public void testMember() {
@@ -199,4 +203,28 @@ class MemberRepositoryTest {
         assertThat(page.isFirst()).isTrue();
         assertThat(page.hasNext()).isTrue();
     }
+
+    @Test
+    public void bulkUpdate() {
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 19));
+        memberRepository.save(new Member("member3", 20));
+        memberRepository.save(new Member("member4", 21));
+        memberRepository.save(new Member("member5", 40));
+
+        int resultCount = memberRepository.bulkAgePlus(20);
+        // 벌큰연산 이후에 영속성 컨텍스트는 다 날려야된다.
+        // em.clear();
+
+        List<Member> result = memberRepository.findByUsername("member5");
+        Member member = result.get(0); // 40
+        // 벌크연산을 하게되면 영속성컨텍스트에 반영되는 것이 아니라 그냥 DB에 때려버리기 때문에 영속성 컨텍스트는
+        // 해당 사실을 모른다. 그래서 계속해서 영속성 컨텍스트는 40살로 남아있는 것이다.
+        System.out.println(member);
+
+        assertThat(resultCount).isEqualTo(3); // 20살 이상인 사람은 나이 +1 하기
+    }
+
+
+
 }
