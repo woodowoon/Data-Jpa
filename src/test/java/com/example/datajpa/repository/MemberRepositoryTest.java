@@ -6,7 +6,6 @@ import com.example.datajpa.entity.Team;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
@@ -27,6 +26,8 @@ class MemberRepositoryTest {
     @Autowired TeamRepository teamRepository;
     @PersistenceContext
     EntityManager em;
+
+    @Autowired MemberQueryRepository memberQueryRepository;
 
     @Test
     public void testMember() {
@@ -278,6 +279,12 @@ class MemberRepositoryTest {
 
         // when
         List<Member> result = memberRepository.findLockByUsername("member1");
+    }
+
+    @Test
+    public void callCustom() {
+        List<Member> result = memberRepository.findMemberCustom();
+
     }
 
 }
