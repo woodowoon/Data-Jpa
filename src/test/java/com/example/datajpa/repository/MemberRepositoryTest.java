@@ -225,6 +225,34 @@ class MemberRepositoryTest {
         assertThat(resultCount).isEqualTo(3); // 20살 이상인 사람은 나이 +1 하기
     }
 
+    @Test
+    public void findMemberLazy() {
+        // given
+        // member1 -> teamA
+        // member2 -> teamB
 
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+
+        Member member1 = new Member("member1", 10, teamA);
+        Member member2 = new Member("member1", 10, teamB);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        em.flush();
+        em.clear();
+
+        // when N + 1
+        // Member 1
+        List<Member> members = memberRepository.findEntityGraphByUsername("member1");
+
+        for (Member member : members) {
+            System.out.println("member = " + member.getUsername());
+            System.out.println("member.teamClass = " + member.getTeam().getClass()); // 패치조인하게 되면 진짜 Team 객체를 가져온다 프록시 X
+            System.out.println("member.getTeam().getName() = " + member.getTeam().getName());
+        }
+    }
 
 }
